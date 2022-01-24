@@ -1,8 +1,10 @@
 from fastapi.testclient import TestClient
 import pytest
 
+from app import models
 from app.main import app
 from app.database import get_db, Base
+from app.oauth2 import create_access_token
 
 from tests.database import TestingSessionLocal, engine
 
@@ -53,3 +55,33 @@ def test_user(client):
     assert res.status_code == 201
     new_user = dict(password=user_data['password'], **res.json())
     return new_user
+
+
+@pytest.fixture
+def token(test_user):
+    access_token = create_access_token(data=dict(user_id=test_user['id']))
+    return access_token
+
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers.update({'Authorization': f'Bearer {token}'})
+    return client
+
+
+@pytest.fixture
+def test_posts(test_user, session):
+    posts_data = [{'title': 'title 1', 'content': 'content_1', 'owner_id': test_user['id']},
+                  {'title': 'title 2', 'content': 'content_2', 'owner_id': test_user['id']},
+                  {'title': 'title 3', 'content': 'content_3', 'owner_id': test_user['id']}]
+
+    for post in posts_data:
+        model_post = models.Post(**post)
+        session.add(model_post)
+
+    session.commit()
+
+    post_query = session.query(models.Post)\
+        .all()
+
+    return post_query
