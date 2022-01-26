@@ -70,10 +70,11 @@ def authorized_client(client, token):
 
 
 @pytest.fixture
-def test_posts(test_user, session):
+def test_posts(test_user, session, test_user_2):
     posts_data = [{'title': 'title 1', 'content': 'content_1', 'owner_id': test_user['id']},
                   {'title': 'title 2', 'content': 'content_2', 'owner_id': test_user['id']},
-                  {'title': 'title 3', 'content': 'content_3', 'owner_id': test_user['id']}]
+                  {'title': 'title 3', 'content': 'content_3', 'owner_id': test_user['id']},
+                  {'title': 'title 4', 'content': 'content_4', 'owner_id': test_user_2['id']}]
 
     for post in posts_data:
         model_post = models.Post(**post)
@@ -85,3 +86,12 @@ def test_posts(test_user, session):
         .all()
 
     return post_query
+
+
+@pytest.fixture
+def test_user_2(client):
+    user_data = {"email": "gareth@gmail.com", "password": "password1234"}
+    res = client.post('/users/', json=user_data)
+    assert res.status_code == 201
+    new_user = dict(password=user_data['password'], **res.json())
+    return new_user
