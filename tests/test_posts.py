@@ -1,5 +1,4 @@
 import pytest
-from typing import List
 from app.schemas import PostOut, Post
 
 
