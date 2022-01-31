@@ -30,4 +30,4 @@ app.include_router(vote.router)
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to my application pushed to heroku by ci/cd"}
+    return {"message": "Welcome to my application check deploy to ubuntu"}
