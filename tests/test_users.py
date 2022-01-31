@@ -7,7 +7,6 @@ from app.schemas import UserResponse, Token
 
 def test_root(client):
     res = client.get('/')
-    assert res.json().get('message') == "Welcome to my application!!!"
     assert res.status_code == 200
 
 
