@@ -3,7 +3,7 @@ name: Build and Deploy Code
 on: [push, pull_request]
 
 jobs:
-  job_1:
+  build:
     environment:
       name: testing
     env:
@@ -62,3 +62,18 @@ jobs:
 #          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-tutorial-app:latest
 #          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-tutorial-app:buildcache
 #          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-tutorial-app:buildcache,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment:
+      name: production
+    steps:
+      - name: Pulling git repo
+        uses: actions/checkout@v2
+      - name: Deploying to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
